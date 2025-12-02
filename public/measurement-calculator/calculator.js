@@ -460,19 +460,26 @@
 
     // --- Product Page Injection ---
     function injectProductRecommendation() {
+        console.log("ONB: Tentando injetar recomendação...");
+
         // 1. Check if data exists
         const storedData = localStorage.getItem('onb_data');
-        if (!storedData) return;
+        if (!storedData) {
+            console.log("ONB: Nenhum dado encontrado no localStorage.");
+            return;
+        }
 
         const userData = JSON.parse(storedData);
         const { width, depth, kitSize, bladeSize } = userData;
+        console.log("ONB: Dados carregados:", userData);
 
         // 2. Determine Context & Content
         let titleHTML = '';
         let valueText = '';
         const href = window.location.href;
 
-        if (href.includes('grelha') || true) { // Force true for testing
+        // Force check for testing or specific contexts
+        if (href.includes('grelha') || true) {
             const targetGrillW = (width - 5) / 2;
             const bestGrill = GRILL_SIZES.reduce((prev, curr) => {
                 if (curr.w <= targetGrillW && curr.d <= depth) {
@@ -495,13 +502,34 @@
             valueText = `${bladeSize} CM`;
         }
 
-        if (!valueText) return;
+        if (!valueText) {
+            console.log("ONB: Nenhuma recomendação gerada para este contexto.");
+            return;
+        }
 
         // 3. Find Injection Point
-        const variationsWrapper = document.querySelector('.listing-wrapper[data-target="variacao"]');
+        // Try multiple selectors common in Wbuy
+        const selectors = [
+            '.listing-wrapper[data-target="variacao"]',
+            '.product-variations',
+            '.variacoes',
+            '.listing-wrapper' // Fallback
+        ];
+
+        let variationsWrapper = null;
+        for (const sel of selectors) {
+            variationsWrapper = document.querySelector(sel);
+            if (variationsWrapper) {
+                console.log("ONB: Wrapper encontrado com seletor:", sel);
+                break;
+            }
+        }
 
         if (variationsWrapper) {
-            if (document.querySelector('.onb-inline-container')) return;
+            if (document.querySelector('.onb-inline-container')) {
+                console.log("ONB: Widget já injetado.");
+                return;
+            }
 
             const html = `
                 <div class="onb-inline-container v6-style">
@@ -518,24 +546,40 @@
             `;
 
             variationsWrapper.insertAdjacentHTML('afterend', html);
+            console.log("ONB: Widget injetado com sucesso!");
 
             document.getElementById('onb-inline-btn').addEventListener('click', (e) => {
                 e.preventDefault();
-                // Ensure state is populated with stored data
                 state.userData = userData;
                 openModal('custom');
             });
+        } else {
+            console.log("ONB: Wrapper de variação não encontrado.");
         }
+    }
+
+    // --- Observer for Dynamic Content ---
+    function startObserver() {
+        const observer = new MutationObserver((mutations) => {
+            if (document.querySelector('.onb-inline-container')) return; // Already injected
+            injectProductRecommendation();
+        });
+
+        observer.observe(document.body, { childList: true, subtree: true });
     }
 
     // Run
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', () => {
+            init();
+            startObserver();
+        });
     } else {
         init();
+        startObserver();
     }
 
-    // Try to inject on load if data exists
+    // Also try on load
     window.addEventListener('load', injectProductRecommendation);
 
 })();
