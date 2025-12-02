@@ -90,10 +90,9 @@
         const path = window.location.pathname;
         const href = window.location.href;
 
-        if (href.includes('/kit') || href.includes('index.html') || path === '/' || path === '') {
-            renderLauncher();
-            startCalloutLoop();
-        }
+        // Always render for testing purposes
+        renderLauncher();
+        startCalloutLoop();
     }
 
     function injectStyles() {

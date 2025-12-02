@@ -275,6 +275,7 @@
             submitPartialData();
         }
     }
+    window.lbToggleChat = toggleChat;
 
     function addMessage(text, sender = 'bot') {
         const body = document.getElementById('lb-body');
@@ -357,10 +358,6 @@
                 <input type="text" id="lb-name" class="lb-form-input" placeholder="Seu nome completo">
             </div>
             <div class="lb-form-group">
-                <label class="lb-form-label">E-mail</label>
-                <input type="email" id="lb-email" class="lb-form-input" placeholder="seu@email.com">
-            </div>
-            <div class="lb-form-group">
                 <label class="lb-form-label">WhatsApp</label>
                 <input type="tel" id="lb-phone" class="lb-form-input" placeholder="(00) 00000-0000">
             </div>
@@ -368,11 +365,7 @@
                 <label class="lb-form-label">CEP</label>
                 <input type="text" id="lb-cep" class="lb-form-input" placeholder="00000-000">
             </div>
-            <div class="lb-form-group">
-                <label class="lb-form-label">Como podemos te ajudar? (Opcional)</label>
-                <textarea id="lb-message" class="lb-form-input" placeholder="Caso queira adiantar, contenos como podemos te ajudar? Qual sua dúvida ou necessidade?" style="resize: vertical; min-height: 60px;"></textarea>
-            </div>
-            <button class="lb-form-btn" onclick="window.lbSubmitLead()">Receber suporte agora</button>
+            <button class="lb-form-btn" onclick="window.lbSubmitContactInfo()">Continuar</button>
         `;
         body.appendChild(formDiv);
         body.scrollTop = body.scrollHeight;
@@ -397,27 +390,75 @@
         }, 100);
     };
 
-    window.lbSubmitLead = async function () {
+    window.lbSubmitContactInfo = async function () {
         const name = document.getElementById('lb-name').value;
-        const email = document.getElementById('lb-email').value;
         const phone = document.getElementById('lb-phone').value;
         const cep = document.getElementById('lb-cep').value;
-        const message = document.getElementById('lb-message').value;
 
-        if (!name || !email || !phone || !cep) {
+        if (!name || !phone || !cep) {
             alert("Por favor, preencha todos os campos obrigatórios.");
             return;
         }
 
         document.querySelector('.lb-form-bubble').remove();
-        addMessage(`Meus dados de contato são: <br>Nome: ${name} <br>E-mail: ${email} <br>WhatsApp: ${phone} <br>CEP: ${cep} <br>Dúvida: ${message}`, 'user');
+        addMessage(`Meus dados: <br>Nome: ${name} <br>WhatsApp: ${phone} <br>CEP: ${cep}`, 'user');
 
-        state.lead = { name, email, phone, cep, message };
+        state.lead = { ...state.lead, name, phone, cep };
 
+        await botSpeak(`Olá ${name.split(' ')[0]}, como podemos te ajudar?`);
+        window.lbShowInterestOptions();
+    };
+
+    window.lbShowInterestOptions = function () {
+        const body = document.getElementById('lb-body');
+        const btnDiv = document.createElement('div');
+        btnDiv.className = 'lb-options';
+        btnDiv.innerHTML = `
+            <button class="lb-option-btn" onclick="window.lbHandleInterest('Orçamentos')">Orçamentos</button>
+            <button class="lb-option-btn" onclick="window.lbHandleInterest('Dúvidas')">Dúvidas</button>
+            <button class="lb-option-btn" onclick="window.lbHandleInterest('Rastreio de pedidos')">Rastreio de pedidos</button>
+        `;
+        body.appendChild(btnDiv);
+        body.scrollTop = body.scrollHeight;
+    };
+
+    window.lbHandleInterest = async function (interest) {
+        document.querySelector('.lb-options').remove();
+        addMessage(interest, 'user');
+        state.lead.interest = interest;
+
+        if (interest === 'Orçamentos') {
+            await botSpeak("Tem interesse em qual tipo de projeto?");
+            window.lbShowProjectOptions();
+        } else {
+            window.lbFinalizeLead();
+        }
+    };
+
+    window.lbShowProjectOptions = function () {
+        const body = document.getElementById('lb-body');
+        const btnDiv = document.createElement('div');
+        btnDiv.className = 'lb-options';
+        btnDiv.innerHTML = `
+            <button class="lb-option-btn" onclick="window.lbHandleProject('Kit suporte Suspenso')">Kit suporte Suspenso</button>
+            <button class="lb-option-btn" onclick="window.lbHandleProject('Churrasqueira Automatizada')">Churrasqueira Automatizada</button>
+        `;
+        body.appendChild(btnDiv);
+        body.scrollTop = body.scrollHeight;
+    };
+
+    window.lbHandleProject = async function (projectType) {
+        document.querySelector('.lb-options').remove();
+        addMessage(projectType, 'user');
+        state.lead.projectType = projectType;
+        window.lbFinalizeLead();
+    };
+
+    window.lbFinalizeLead = async function () {
         await botSpeak("Enviando seus dados...");
         await submitData('lead');
 
-        await botSpeak(`Perfeito, ${name.split(' ')[0]}. Em alguns instantes nossa equipe irá entrar em contato com você.`);
+        await botSpeak(`Perfeito! Em alguns instantes nossa equipe irá entrar em contato com você.`);
         await new Promise(r => setTimeout(r, 1000));
         await botSpeak("Enquanto isso, gostaria de responder algumas perguntas para receber um atendimento ainda mais personalizado?");
 
