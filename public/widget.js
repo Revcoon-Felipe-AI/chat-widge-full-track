@@ -6,7 +6,7 @@
         textColor: '#ffffff',
         botName: 'Projetos Olho na Brasa',
         botAvatar: 'https://s3.1app.com.br/master/project_24727/xy6IrcJy1jkUGTlM4qSc7cF1suHmQyDE.jpg',
-        backendUrl: '/.netlify/functions/collect-lead',
+        backendUrl: 'https://[SEU-SITE-NETLIFY].netlify.app/.netlify/functions/collect-lead', // SUBSTITUA [SEU-SITE-NETLIFY] PELA URL DO SEU SITE NO NETLIFY
         delays: {
             typing: 1000,
             message: 1500,
