@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Provador Virtual - Demo</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 50px;
+            text-align: center;
+            background: #f0f0f0;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Demo Provador Virtual</h1>
+    <p>Simule as rotas para ver o comportamento do widget.</p>
+
+    <button class="btn" onclick="history.pushState({}, '', '/kit'); location.reload();">Simular Página de Kit
+        (/kit)</button>
+    <button class="btn" onclick="history.pushState({}, '', '/espeto'); location.reload();">Simular Página de Espeto
+        (/espeto)</button>
+    <button class="btn" onclick="history.pushState({}, '', '/home'); location.reload();">Simular Home (Oculto)</button>
+
+    <h1>Olho na Brasa - Configurador</h1>
+
+    <!-- Mock Wbuy Product Page Structure -->
+    <div class="product-container" style="max-width: 800px; margin: 0 auto; padding: 20px;">
+        <h2>Simulação de Página de Produto</h2>
+
+        <!-- Variations Block -->
+        <div class="listing-wrapper" data-target="variacao">
+            <div class="listing">
+                <div class="group">
+                    <span class="t">Tamanho</span>
+                    <div class="input_wrapper">
+                        <input type="checkbox" name="filtro[]" value="1">
+                        <span>P</span>
+                    </div>
+                    <div class="input_wrapper">
+                        <input type="checkbox" name="filtro[]" value="2">
+                        <span>M</span>
+                    </div>
+                    <div class="input_wrapper">
+                        <input type="checkbox" name="filtro[]" value="3">
+                        <span>G</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Injection Point should be here -->
+    </div>
+
+    <!-- Widget Script -->
+    <script src="calculator.js"></script>
+</body>
+
+</html>

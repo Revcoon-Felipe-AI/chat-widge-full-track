@@ -26,9 +26,9 @@
             question: 'Para quantas pessoas você costuma fazer churrasco?',
             type: 'radio',
             options: [
-                { label: 'Até 10 pessoas (família próxima)', value: 'ate_10' },
-                { label: '10-20 pessoas (amigos próximos)', value: '10_20' },
-                { label: '20+ pessoas (eventos/festas)', value: '20_mais' }
+                { label: 'Até 10 pessoas (família próxima)', value: 'Costumo fazer churrasco para até 10 pessoas (família próxima)' },
+                { label: '10-20 pessoas (amigos próximos)', value: 'Costumo fazer churrasco para 10 a 20 pessoas' },
+                { label: '20+ pessoas (eventos/festas)', value: 'Costumo fazer churrasco para mais de 20 pessoas (eventos)' }
             ]
         },
         {
@@ -37,11 +37,11 @@
             type: 'checkbox',
             maxSelect: 5,
             options: [
-                { label: 'Picanha', value: 'picanha' },
-                { label: 'Costela', value: 'costela' },
-                { label: 'Fraldinha/Contra-filé', value: 'fraldinha' },
-                { label: 'Linguiça/Medalhões', value: 'linguica' },
-                { label: 'Frango/Peixe', value: 'frango_peixe' }
+                { label: 'Picanha', value: 'Gosto de preparar Picanha' },
+                { label: 'Costela', value: 'Gosto de preparar Costela' },
+                { label: 'Fraldinha/Contra-filé', value: 'Gosto de preparar Fraldinha ou Contra-filé' },
+                { label: 'Linguiça/Medalhões', value: 'Gosto de preparar Linguiça ou Medalhões' },
+                { label: 'Frango/Peixe', value: 'Gosto de preparar Frango ou Peixe' }
             ]
         },
         {
@@ -49,9 +49,9 @@
             question: 'Sua churrasqueira tem barra frontal?',
             type: 'radio',
             options: [
-                { label: 'Sim, tem barra frontal', value: 'sim_barra' },
-                { label: 'Não, é só alvenaria', value: 'nao_alvenaria' },
-                { label: 'Não tenho churrasqueira ainda (em obra)', value: 'em_obra' }
+                { label: 'Sim, tem barra frontal', value: 'Minha churrasqueira possui barra frontal' },
+                { label: 'Não, é só alvenaria', value: 'Minha churrasqueira não tem barra, é só alvenaria' },
+                { label: 'Não tenho churrasqueira ainda (em obra)', value: 'Ainda não tenho churrasqueira (estou em obra)' }
             ]
         },
         {
@@ -59,10 +59,10 @@
             question: 'Você já conhecia o Kit Suporte Suspenso?',
             type: 'radio',
             options: [
-                { label: 'Sim, estava procurando especificamente', value: 'procurando' },
-                { label: 'Já ouvi falar, mas não conheço detalhes', value: 'ouvi_falar' },
-                { label: 'Não, é primeira vez que vejo', value: 'primeira_vez' },
-                { label: 'Já vi na casa de amigos', value: 'vi_amigos' }
+                { label: 'Sim, estava procurando especificamente', value: 'Sim, eu já conhecia e estava procurando especificamente o Kit Suporte Suspenso' },
+                { label: 'Já ouvi falar, mas não conheço detalhes', value: 'Já ouvi falar do Kit, mas não conheço os detalhes' },
+                { label: 'Não, é primeira vez que vejo', value: 'Não, é a primeira vez que vejo o Kit' },
+                { label: 'Já vi na casa de amigos', value: 'Já vi o Kit na casa de amigos' }
             ]
         },
         {
@@ -70,9 +70,9 @@
             question: 'Sua churrasqueira já está pronta ou está em obra/reforma?',
             type: 'radio',
             options: [
-                { label: 'Em obra/reforma - ainda construindo', value: 'em_obra' },
-                { label: 'Pronta - só trocar o kit', value: 'pronta' },
-                { label: 'Planejando - ainda escolhendo', value: 'planejando' }
+                { label: 'Em obra/reforma - ainda construindo', value: 'Minha churrasqueira está em obra/reforma' },
+                { label: 'Pronta - só trocar o kit', value: 'Minha churrasqueira já está pronta, só falta o kit' },
+                { label: 'Planejando - ainda escolhendo', value: 'Estou apenas planejando e escolhendo' }
             ]
         },
         {
@@ -80,12 +80,12 @@
             question: 'Qual é sua maior dificuldade no churrasco hoje?',
             type: 'checkbox',
             options: [
-                { label: 'Queimar a carne (não acerto o ponto)', value: 'queimar_carne' },
-                { label: 'Limpeza demorada (trabalheira)', value: 'limpeza' },
-                { label: 'Subir o nível da Carne sem tirar a Grelha', value: 'subir_nivel' },
-                { label: 'Colocar ou trocar o Carvão', value: 'carvao' },
-                { label: 'Preparar vários tipos de carne ao mesmo tempo', value: 'varios_tipos' },
-                { label: 'Servir o churrasco de 1 só vez', value: 'servir_vez' }
+                { label: 'Queimar a carne (não acerto o ponto)', value: 'Tenho dificuldade em acertar o ponto (queimo a carne)' },
+                { label: 'Limpeza demorada (trabalheira)', value: 'Acho a limpeza muito demorada e trabalhosa' },
+                { label: 'Subir o nível da Carne sem tirar a Grelha', value: 'Tenho dificuldade para subir o nível da carne sem tirar a grelha' },
+                { label: 'Colocar ou trocar o Carvão', value: 'Tenho dificuldade para colocar ou trocar o carvão' },
+                { label: 'Preparar vários tipos de carne ao mesmo tempo', value: 'Tenho dificuldade em preparar vários tipos de carne ao mesmo tempo' },
+                { label: 'Servir o churrasco de 1 só vez', value: 'Tenho dificuldade em servir o churrasco de uma só vez' }
             ]
         },
         {
@@ -94,11 +94,11 @@
             type: 'checkbox',
             maxSelect: 5,
             options: [
-                { label: 'As medidas não ficarem perfeitas com a minha churrasqueira', value: 'caber' },
-                { label: 'O preço fugir do meu orçamento', value: 'preco' },
-                { label: 'Prazo de entrega muito demorado', value: 'prazo' },
-                { label: 'Qualidade do material muito ruim e sem durabilidade', value: 'qualidade' },
-                { label: 'Se enferruja ou é corroído pela maresia', value: 'ferrugem' }
+                { label: 'As medidas não ficarem perfeitas com a minha churrasqueira', value: 'Tenho medo das medidas não ficarem perfeitas' },
+                { label: 'O preço fugir do meu orçamento', value: 'Tenho preocupação com o preço fugir do orçamento' },
+                { label: 'Prazo de entrega muito demorado', value: 'Tenho receio do prazo de entrega ser demorado' },
+                { label: 'Qualidade do material muito ruim e sem durabilidade', value: 'Tenho preocupação com a qualidade e durabilidade do material' },
+                { label: 'Se enferruja ou é corroído pela maresia', value: 'Tenho medo que enferruje ou sofra com maresia' }
             ]
         },
         {
