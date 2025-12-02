@@ -481,7 +481,23 @@
             // 2. Determine Context & Content (Existing Logic)
             const href = window.location.href;
 
-            if (href.includes('grelha')) {
+            if (href.includes('grelha-descanso')) {
+                // Resting Grill Logic (Same calculation for now, just different title)
+                const targetGrillW = (width - 5) / 2;
+                const bestGrill = GRILL_SIZES.reduce((prev, curr) => {
+                    if (curr.w <= targetGrillW && curr.d <= depth) {
+                        if (!prev) return curr;
+                        if (curr.w > prev.w) return curr;
+                        if (curr.w === prev.w && curr.d > prev.d) return curr;
+                    }
+                    return prev;
+                }, null);
+
+                if (bestGrill) {
+                    titleHTML = 'GRELHA DESCANSO <span>RECOMENDADA</span>';
+                    valueText = `${bestGrill.w}L X ${bestGrill.d}C`;
+                }
+            } else if (href.includes('grelha')) {
                 const targetGrillW = (width - 5) / 2;
                 const bestGrill = GRILL_SIZES.reduce((prev, curr) => {
                     if (curr.w <= targetGrillW && curr.d <= depth) {
