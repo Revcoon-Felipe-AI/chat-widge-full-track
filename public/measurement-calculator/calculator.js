@@ -91,8 +91,8 @@
         const href = window.location.href;
 
         // Always render for testing purposes
-        renderLauncher();
-        startCalloutLoop();
+        // renderLauncher();
+        // startCalloutLoop();
     }
 
     function injectStyles() {
@@ -138,7 +138,8 @@
     function openModal(targetView = 'input') {
         state.isOpen = true;
         state.view = targetView;
-        document.getElementById('onb-conf-callout').style.display = 'none';
+        const callout = document.getElementById('onb-conf-callout');
+        if (callout) callout.style.display = 'none';
 
         if (!document.getElementById('onb-conf-modal-overlay')) {
             createModalStructure();
@@ -159,6 +160,7 @@
         state.isOpen = false;
         document.getElementById('onb-conf-modal-overlay').style.display = 'none';
     }
+    window.lbOpenCalculator = openModal;
 
     function createModalStructure() {
         const overlay = document.createElement('div');
@@ -464,47 +466,63 @@
 
         // 1. Check if data exists
         const storedData = localStorage.getItem('onb_data');
-        if (!storedData) {
-            console.log("ONB: Nenhum dado encontrado no localStorage.");
-            return;
-        }
-
-        const userData = JSON.parse(storedData);
-        const { width, depth, kitSize, bladeSize } = userData;
-        console.log("ONB: Dados carregados:", userData);
-
-        // 2. Determine Context & Content
+        let userData = null;
         let titleHTML = '';
         let valueText = '';
-        const href = window.location.href;
+        let subText = '';
+        let btnText = '';
+        let isDefault = false;
 
-        // Force check for testing or specific contexts
-        if (href.includes('grelha') || true) {
-            const targetGrillW = (width - 5) / 2;
-            const bestGrill = GRILL_SIZES.reduce((prev, curr) => {
-                if (curr.w <= targetGrillW && curr.d <= depth) {
-                    if (!prev) return curr;
-                    if (curr.w > prev.w) return curr;
-                    if (curr.w === prev.w && curr.d > prev.d) return curr;
+        if (storedData) {
+            userData = JSON.parse(storedData);
+            const { width, depth, kitSize, bladeSize } = userData;
+            console.log("ONB: Dados carregados:", userData);
+
+            // 2. Determine Context & Content (Existing Logic)
+            const href = window.location.href;
+
+            if (href.includes('grelha')) {
+                const targetGrillW = (width - 5) / 2;
+                const bestGrill = GRILL_SIZES.reduce((prev, curr) => {
+                    if (curr.w <= targetGrillW && curr.d <= depth) {
+                        if (!prev) return curr;
+                        if (curr.w > prev.w) return curr;
+                        if (curr.w === prev.w && curr.d > prev.d) return curr;
+                    }
+                    return prev;
+                }, null);
+
+                if (bestGrill) {
+                    titleHTML = 'GRELHA <span>RECOMENDADA</span>';
+                    valueText = `${bestGrill.w}L X ${bestGrill.d}C`;
                 }
-                return prev;
-            }, null);
-
-            if (bestGrill) {
-                titleHTML = 'GRELHA <span>RECOMENDADA</span>';
-                valueText = `${bestGrill.w}L X ${bestGrill.d}C`;
+            } else if (href.includes('kit')) {
+                titleHTML = 'KIT <span>RECOMENDADO</span>';
+                valueText = `${kitSize}L CM`;
+            } else if (href.includes('suporte')) {
+                titleHTML = 'SUPORTE <span>RECOMENDADO</span>';
+                valueText = `${kitSize}L CM`;
+            } else if (href.includes('espeto')) {
+                titleHTML = 'ESPETO <span>RECOMENDADO</span>';
+                valueText = `${bladeSize} CM`;
             }
-        } else if (href.includes('kit')) {
-            titleHTML = 'KIT <span>RECOMENDADO</span>';
-            valueText = `${kitSize}L CM`;
-        } else if (href.includes('espeto')) {
-            titleHTML = 'ESPETO <span>RECOMENDADO</span>';
-            valueText = `${bladeSize} CM`;
+
+            if (valueText) {
+                subText = `Baseado nas medidas ${width}x${depth}cm que você forneceu.`;
+                btnText = 'Medidas por Produtos';
+            }
         }
 
+        // Default State (No Data or No Context Match)
         if (!valueText) {
-            console.log("ONB: Nenhuma recomendação gerada para este contexto.");
-            return;
+            console.log("ONB: Sem dados ou contexto. Exibindo widget padrão.");
+            isDefault = true;
+            titleHTML = 'DÚVIDAS <span>SOBRE MEDIDAS</span>';
+            valueText = 'Use nossa calculadora e descubra a medida exata para sua churrasqueira';
+            // For default state, valueText acts as the subtitle/description in the box or we adjust layout
+            // User requested: Font Alfa: (black: DUVIDAS) (laranja: SOBRE MEDIDAS)
+            // Subtitle: Use nossa calculadora...
+            // Button: Calculadora de medidas
         }
 
         // 3. Find Injection Point
@@ -526,33 +544,60 @@
         }
 
         if (variationsWrapper) {
-            if (document.querySelector('.onb-inline-container')) {
-                console.log("ONB: Widget já injetado.");
-                return;
-            }
+            let container = document.querySelector('.onb-inline-container');
 
-            const html = `
-                <div class="onb-inline-container v6-style">
+            let html = '';
+            if (isDefault) {
+                // Default Layout
+                html = `
                     <div class="onb-v6-content inline-mode">
-                        <div class="onb-v6-label">${titleHTML}</div>
-                        <div class="onb-v6-box">${valueText}</div>
-                        <div class="onb-inline-sub">Baseado nas medidas ${width}x${depth}cm que você forneceu.</div>
+                        <div class="onb-v6-label" style="font-size: 14px;">${titleHTML}</div>
+                        <div class="onb-inline-sub" style="margin-top: 4px; font-size: 13px; color: #666;">${valueText}</div>
                     </div>
                     <button id="onb-inline-btn" class="onb-inline-btn">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.4 2.4 0 0 1 0-3.4l2.6-2.6a2.4 2.4 0 0 1 3.4 0z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></svg>
-                        Medidas por Produtos
+                        Calculadora de medidas
                     </button>
-                </div>
-            `;
+                `;
+            } else {
+                // Recommendation Layout
+                html = `
+                    <div class="onb-v6-content inline-mode">
+                        <div class="onb-v6-label">${titleHTML}</div>
+                        <div class="onb-v6-box">${valueText}</div>
+                        <div class="onb-inline-sub">${subText}</div>
+                    </div>
+                    <button id="onb-inline-btn" class="onb-inline-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.4 2.4 0 0 1 0-3.4l2.6-2.6a2.4 2.4 0 0 1 3.4 0z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></svg>
+                        ${btnText}
+                    </button>
+                `;
+            }
 
-            variationsWrapper.insertAdjacentHTML('afterend', html);
-            console.log("ONB: Widget injetado com sucesso!");
+            if (container) {
+                console.log("ONB: Atualizando widget existente.");
+                container.innerHTML = html;
+            } else {
+                console.log("ONB: Injetando novo widget.");
+                container = document.createElement('div');
+                container.className = 'onb-inline-container v6-style';
+                container.innerHTML = html;
+                variationsWrapper.insertAdjacentElement('afterend', container);
+            }
 
-            document.getElementById('onb-inline-btn').addEventListener('click', (e) => {
-                e.preventDefault();
-                state.userData = userData;
-                openModal('custom');
-            });
+            // Re-attach listener
+            const btn = container.querySelector('#onb-inline-btn');
+            if (btn) {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (isDefault) {
+                        openModal('input');
+                    } else {
+                        state.userData = userData;
+                        openModal('custom');
+                    }
+                });
+            }
         } else {
             console.log("ONB: Wrapper de variação não encontrado.");
         }
