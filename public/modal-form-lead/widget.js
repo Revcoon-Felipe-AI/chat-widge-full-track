@@ -15,22 +15,94 @@
 
     const QUIZ_QUESTIONS = [
         {
-            id: 'tipo_churrasqueira',
-            text: 'Qual seu tipo de churrasqueira?',
+            id: 'custom-qntd-pessoas-1-14',
+            text: 'Para quantas pessoas você costuma fazer churrasco?',
             type: 'radio',
-            options: ['Alvenaria (Tijolinho)', 'Pré-moldada', 'Vidro / Inox', 'Ainda em obra']
+            options: [
+                { label: 'Até 10 pessoas (família próxima)', value: 'Costumo fazer churrasco para até 10 pessoas (família próxima)' },
+                { label: '10-20 pessoas (amigos próximos)', value: 'Costumo fazer churrasco para 10 a 20 pessoas' },
+                { label: '20+ pessoas (eventos/festas)', value: 'Costumo fazer churrasco para mais de 20 pessoas (eventos)' }
+            ]
         },
         {
-            id: 'interesses',
-            text: 'O que você procura?',
+            id: 'custom-tipo-preparo-1-13',
+            text: 'Quais cortes você mais prepara?',
             type: 'checkbox',
-            options: ['Kit Giratório', 'Grelha Elevatória', 'Suporte Fixo', 'Acessórios']
+            maxSelect: 5,
+            options: [
+                { label: 'Picanha', value: 'Gosto de preparar Picanha' },
+                { label: 'Costela', value: 'Gosto de preparar Costela' },
+                { label: 'Fraldinha/Contra-filé', value: 'Gosto de preparar Fraldinha ou Contra-filé' },
+                { label: 'Linguiça/Medalhões', value: 'Gosto de preparar Linguiça ou Medalhões' },
+                { label: 'Frango/Peixe', value: 'Gosto de preparar Frango ou Peixe' }
+            ]
         },
         {
-            id: 'prazo',
-            text: 'Quando pretende adquirir?',
+            id: 'custom-possui-barra-1-12',
+            text: 'Sua churrasqueira tem barra frontal?',
             type: 'radio',
-            options: ['Imediato', 'Próximos 30 dias', 'Apenas pesquisando']
+            options: [
+                { label: 'Sim, tem barra frontal', value: 'Minha churrasqueira possui barra frontal' },
+                { label: 'Não, é só alvenaria', value: 'Minha churrasqueira não tem barra, é só alvenaria' },
+                { label: 'Não tenho churrasqueira ainda (em obra)', value: 'Ainda não tenho churrasqueira (estou em obra)' }
+            ]
+        },
+        {
+            id: 'custom-conhecia-o-kit-1-11',
+            text: 'Você já conhecia o Kit Suporte Suspenso?',
+            type: 'radio',
+            options: [
+                { label: 'Sim, estava procurando especificamente', value: 'Sim, eu já conhecia e estava procurando especificamente o Kit Suporte Suspenso' },
+                { label: 'Já ouvi falar, mas não conheço detalhes', value: 'Já ouvi falar do Kit, mas não conheço os detalhes' },
+                { label: 'Não, é primeira vez que vejo', value: 'Não, é a primeira vez que vejo o Kit' },
+                { label: 'Já vi na casa de amigos', value: 'Já vi o Kit na casa de amigos' }
+            ]
+        },
+        {
+            id: 'custom-churrasqueira-ja-esta-pronta-1-10',
+            text: 'Sua churrasqueira já está pronta ou está em obra/reforma?',
+            type: 'radio',
+            options: [
+                { label: 'Em obra/reforma - ainda construindo', value: 'Minha churrasqueira está em obra/reforma' },
+                { label: 'Pronta - só trocar o kit', value: 'Minha churrasqueira já está pronta, só falta o kit' },
+                { label: 'Planejando - ainda escolhendo', value: 'Estou apenas planejando e escolhendo' }
+            ]
+        },
+        {
+            id: 'custom-maior-dificuldade-1-9',
+            text: 'Qual é sua maior dificuldade no churrasco hoje?',
+            type: 'checkbox',
+            options: [
+                { label: 'Queimar a carne (não acerto o ponto)', value: 'Tenho dificuldade em acertar o ponto (queimo a carne)' },
+                { label: 'Limpeza demorada (trabalheira)', value: 'Acho a limpeza muito demorada e trabalhosa' },
+                { label: 'Subir o nível da Carne sem tirar a Grelha', value: 'Tenho dificuldade para subir o nível da carne sem tirar a grelha' },
+                { label: 'Colocar ou trocar o Carvão', value: 'Tenho dificuldade para colocar ou trocar o carvão' },
+                { label: 'Preparar vários tipos de carne ao mesmo tempo', value: 'Tenho dificuldade em preparar vários tipos de carne ao mesmo tempo' },
+                { label: 'Servir o churrasco de 1 só vez', value: 'Tenho dificuldade em servir o churrasco de uma só vez' }
+            ]
+        },
+        {
+            id: 'custom-objecao-compra-1-8',
+            text: 'O que mais te preocupa na hora de adquirir projetos sob-medida?',
+            type: 'checkbox',
+            maxSelect: 5,
+            options: [
+                { label: 'As medidas não ficarem perfeitas com a minha churrasqueira', value: 'Tenho medo das medidas não ficarem perfeitas' },
+                { label: 'O preço fugir do meu orçamento', value: 'Tenho preocupação com o preço fugir do orçamento' },
+                { label: 'Prazo de entrega muito demorado', value: 'Tenho receio do prazo de entrega ser demorado' },
+                { label: 'Qualidade do material muito ruim e sem durabilidade', value: 'Tenho preocupação com a qualidade e durabilidade do material' },
+                { label: 'Se enferruja ou é corroído pela maresia', value: 'Tenho medo que enferruje ou sofra com maresia' }
+            ]
+        },
+        {
+            id: 'custom-text-perfect-bbq',
+            text: 'Descreva o seu churrasco dos sonhos... (o que não poderia faltar nele?)',
+            type: 'textarea'
+        },
+        {
+            id: 'custom-text-project-vision',
+            text: 'O que mais te chamou a atenção nos projetos da Olho na Brasa e que você não abre mão em seu projeto?',
+            type: 'textarea'
         }
     ];
 
@@ -174,6 +246,19 @@
                 accent-color: ${CONFIG.primaryColor};
                 transform: scale(1.2);
             }
+            .lb-quiz-textarea {
+                width: 100%;
+                padding: 12px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                font-size: 15px;
+                outline: none;
+                box-sizing: border-box;
+                min-height: 100px;
+                font-family: inherit;
+                resize: vertical;
+            }
+            .lb-quiz-textarea:focus { border-color: ${CONFIG.primaryColor}; }
             
             .lb-progress-bar {
                 width: 100%;
@@ -283,16 +368,23 @@
         const progress = ((state.quizIndex + 1) / QUIZ_QUESTIONS.length) * 100;
 
         let optionsHtml = '';
-        q.options.forEach((opt, idx) => {
-            const inputType = q.type;
-            const inputName = `q_${state.quizIndex}`;
-            optionsHtml += `
-                <label class="lb-quiz-option">
-                    <input type="${inputType}" name="${inputName}" value="${opt}">
-                    ${opt}
-                </label>
+
+        if (q.type === 'textarea') {
+            optionsHtml = `
+                <textarea id="lb-quiz-textarea" class="lb-quiz-textarea" placeholder="Digite sua resposta aqui..."></textarea>
             `;
-        });
+        } else {
+            q.options.forEach((opt, idx) => {
+                const inputType = q.type;
+                const inputName = `q_${state.quizIndex}`;
+                optionsHtml += `
+                    <label class="lb-quiz-option">
+                        <input type="${inputType}" name="${inputName}" value="${opt.value}">
+                        ${opt.label}
+                    </label>
+                `;
+            });
+        }
 
         content.innerHTML = `
             <div class="lb-modal-header">
@@ -343,6 +435,9 @@
     window.lbOpenModal = openModal;
 
     function closeModal() {
+        if (state.isOpen) {
+            submitPartialData();
+        }
         state.isOpen = false;
         document.getElementById('lb-modal-overlay').classList.remove('open');
     }
@@ -404,7 +499,15 @@
 
         // Get Values
         let answer;
-        if (q.type === 'checkbox') {
+
+        if (q.type === 'textarea') {
+            const textarea = document.getElementById('lb-quiz-textarea');
+            answer = textarea.value.trim();
+            if (!answer) {
+                alert("Por favor, digite uma resposta.");
+                return;
+            }
+        } else if (q.type === 'checkbox') {
             const checked = Array.from(document.querySelectorAll(`input[name="${inputName}"]:checked`));
             if (checked.length === 0) {
                 alert("Por favor, selecione pelo menos uma opção.");
@@ -451,7 +554,20 @@
         renderStep3();
     }
 
-    async function sendData(type, payload) {
+    // --- Partial Submission ---
+    function submitPartialData() {
+        // Only submit if in quiz step (2), not finished, and has some data
+        if (state.step === 2 && state.quizIndex < QUIZ_QUESTIONS.length && Object.keys(state.quiz).length > 0) {
+            console.log("Submitting partial survey data...");
+            sendData('quiz', {
+                lead: state.lead,
+                quiz: state.quiz,
+                tracking: state.tracking
+            }, { keepalive: true });
+        }
+    }
+
+    async function sendData(type, payload, options = {}) {
         try {
             console.log(`Sending ${type} payload:`, payload);
 
@@ -461,7 +577,8 @@
             await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                body: JSON.stringify(payload),
+                ...options
             });
         } catch (error) {
             console.error('Error sending data:', error);
@@ -570,6 +687,11 @@
     function init() {
         injectStyles();
         createModal();
+
+        // Handle page unload
+        window.addEventListener('beforeunload', () => {
+            submitPartialData();
+        });
     }
 
     if (document.readyState === 'loading') {

@@ -79,8 +79,10 @@ O payload JSON enviado para o Webhook (via Netlify Function) segue esta estrutur
   },
   "survey": {
     // Respostas do Quiz (Chave: ID da Pergunta, Valor: Resposta)
-    "tipo_churrasqueira": "Alvenaria",
-    "prazo": "Imediato"
+    "custom-qntd-pessoas-1-14": "Costumo fazer churrasco para 10 a 20 pessoas",
+    "custom-tipo-preparo-1-13": "Picanha, Costela",
+    "custom-possui-barra-1-12": "Minha churrasqueira possui barra frontal",
+    "custom-text-perfect-bbq": "Não pode faltar cerveja gelada e picanha!"
   },
   "tracking": {
     "event_id": "550e8400-e29b-41d4-a716-446655440000",
