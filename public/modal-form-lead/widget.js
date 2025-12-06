@@ -476,10 +476,45 @@
             return '';
         };
 
+        // --- Helper for Event ID ---
+        const generateEventId = () => {
+            if (crypto && crypto.randomUUID) {
+                return crypto.randomUUID();
+            }
+            return 'event-' + Date.now() + '-' + Math.floor(Math.random() * 1000000);
+        };
+
+        // --- Helper for Device Info ---
+        const getDeviceInfo = () => {
+            const ua = navigator.userAgent;
+            let os = 'Unknown';
+            let type = 'Desktop';
+
+            // Detect OS
+            if (/Mac|iOS|iPhone|iPad|iPod/.test(ua)) os = 'Apple';
+            else if (/Windows/.test(ua)) os = 'Windows';
+            else if (/Android/.test(ua)) os = 'Android';
+            else if (/Linux/.test(ua)) os = 'Linux';
+
+            // Detect Type
+            if (/Mobi|Android/i.test(ua)) type = 'Mobile';
+            if (/Tablet|iPad/i.test(ua)) type = 'Tablet';
+
+            return { os, type };
+        };
+
+        const deviceInfo = getDeviceInfo();
         const urlParams = new URLSearchParams(window.location.search);
 
         // --- Enhanced Tracking ---
         const tracking = {
+            // Unique Event ID for Deduplication
+            event_id: generateEventId(),
+
+            // Device Info
+            device_os: deviceInfo.os,
+            device_type: deviceInfo.type,
+
             // Standard UTMs
             utm_source: urlParams.get('utm_source') || '',
             utm_medium: urlParams.get('utm_medium') || '',
@@ -495,11 +530,14 @@
             gbraid: urlParams.get('gbraid') || '',
             msclid: urlParams.get('msclid') || '',
             li_fat_id: urlParams.get('li_fat_id') || '',
+            epik: urlParams.get('epik') || '',
 
             // Cookies
             fbp: getCookie('_fbp'),
             fbc: getCookie('_fbc'),
             ttp: getCookie('_ttp'),
+            epik_cookie: getCookie('_epik'),
+            gcl_au: getCookie('_gcl_au'),
 
             // Meta Info
             url_lead: window.location.href,

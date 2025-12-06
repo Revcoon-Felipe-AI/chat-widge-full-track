@@ -362,6 +362,10 @@
                 <input type="tel" id="lb-phone" class="lb-form-input" placeholder="(00) 00000-0000">
             </div>
             <div class="lb-form-group">
+                <label class="lb-form-label">E-mail</label>
+                <input type="email" id="lb-email" class="lb-form-input" placeholder="seu@email.com">
+            </div>
+            <div class="lb-form-group">
                 <label class="lb-form-label">CEP</label>
                 <input type="text" id="lb-cep" class="lb-form-input" placeholder="00000-000">
             </div>
@@ -393,17 +397,18 @@
     window.lbSubmitContactInfo = async function () {
         const name = document.getElementById('lb-name').value;
         const phone = document.getElementById('lb-phone').value;
+        const email = document.getElementById('lb-email').value;
         const cep = document.getElementById('lb-cep').value;
 
-        if (!name || !phone || !cep) {
+        if (!name || !phone || !email || !cep) {
             alert("Por favor, preencha todos os campos obrigatórios.");
             return;
         }
 
         document.querySelector('.lb-form-bubble').remove();
-        addMessage(`Meus dados: <br>Nome: ${name} <br>WhatsApp: ${phone} <br>CEP: ${cep}`, 'user');
+        addMessage(`Meus dados: <br>Nome: ${name} <br>WhatsApp: ${phone} <br>E-mail: ${email} <br>CEP: ${cep}`, 'user');
 
-        state.lead = { ...state.lead, name, phone, cep };
+        state.lead = { ...state.lead, name, phone, email, cep };
 
         await botSpeak(`Olá ${name.split(' ')[0]}, como podemos te ajudar?`);
         window.lbShowInterestOptions();
@@ -635,6 +640,7 @@
     }
 
     // --- Tracking ---
+    // --- Tracking ---
     function getTrackingData() {
         const getCookie = (name) => {
             const value = `; ${document.cookie}`;
@@ -642,17 +648,92 @@
             if (parts.length === 2) return parts.pop().split(';').shift();
             return '';
         };
-        state.tracking.fbp = getCookie('_fbp');
-        state.tracking.fbc = getCookie('_fbc');
-        state.tracking.ttp = getCookie('_ttp');
-        state.tracking.epik = getCookie('_epik');
-        state.tracking.gcl_au = getCookie('_gcl_au');
 
+        // --- Helper for Event ID ---
+        const generateEventId = () => {
+            if (window.crypto && window.crypto.randomUUID) {
+                return window.crypto.randomUUID();
+            }
+            return 'event-' + Date.now() + '-' + Math.floor(Math.random() * 1000000);
+        };
+
+        // --- Helper for Device Info ---
+        const getDeviceInfo = () => {
+            const ua = navigator.userAgent;
+            let os = 'Unknown';
+            let type = 'Desktop';
+
+            // Detect OS
+            if (/Mac|iOS|iPhone|iPad|iPod/.test(ua)) os = 'Apple';
+            else if (/Windows/.test(ua)) os = 'Windows';
+            else if (/Android/.test(ua)) os = 'Android';
+            else if (/Linux/.test(ua)) os = 'Linux';
+
+            // Detect Type
+            if (/Mobi|Android/i.test(ua)) type = 'Mobile';
+            if (/Tablet|iPad/i.test(ua)) type = 'Tablet';
+
+            return { os, type };
+        };
+
+        const deviceInfo = getDeviceInfo();
         const urlParams = new URLSearchParams(window.location.search);
-        ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'ttclid', 'epik', 'wbraid', 'gbraid'].forEach(param => {
-            state.tracking[param] = urlParams.get(param) || '';
-        });
-        state.tracking.url_lead = window.location.origin + window.location.pathname;
+
+        const tracking = {
+            // Unique Event ID
+            event_id: generateEventId(),
+
+            // Device Info
+            device_os: deviceInfo.os,
+            device_type: deviceInfo.type,
+
+            // Standard UTMs
+            utm_source: urlParams.get('utm_source') || '',
+            utm_medium: urlParams.get('utm_medium') || '',
+            utm_campaign: urlParams.get('utm_campaign') || '',
+            utm_term: urlParams.get('utm_term') || '',
+            utm_content: urlParams.get('utm_content') || '',
+
+            // Ad Platform IDs
+            fbclid: urlParams.get('fbclid') || '',
+            gclid: urlParams.get('gclid') || '',
+            ttclid: urlParams.get('ttclid') || '',
+            wbraid: urlParams.get('wbraid') || '',
+            gbraid: urlParams.get('gbraid') || '',
+            msclid: urlParams.get('msclid') || '',
+            li_fat_id: urlParams.get('li_fat_id') || '',
+            epik: urlParams.get('epik') || '',
+
+            // Cookies
+            fbp: getCookie('_fbp'),
+            fbc: getCookie('_fbc'),
+            ttp: getCookie('_ttp'),
+            epik_cookie: getCookie('_epik'),
+            gcl_au: getCookie('_gcl_au'),
+
+            // Meta Info
+            url_lead: window.location.href,
+            user_agent: navigator.userAgent
+        };
+
+        // --- Determine Conversion Platform ---
+        let platform = 'organic';
+        if (tracking.gclid || tracking.wbraid || tracking.gbraid) {
+            platform = 'google_ads';
+        } else if (tracking.fbclid) {
+            platform = 'facebook_ads';
+        } else if (tracking.ttclid) {
+            platform = 'tiktok_ads';
+        } else if (tracking.msclid) {
+            platform = 'bing_ads';
+        } else if (tracking.li_fat_id) {
+            platform = 'linkedin_ads';
+        } else if (tracking.utm_source) {
+            platform = tracking.utm_source.toLowerCase();
+        }
+
+        tracking.conversion_platform = platform;
+        state.tracking = tracking;
     }
 
     // --- Initialization ---
