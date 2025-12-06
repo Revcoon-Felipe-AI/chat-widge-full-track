@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Modal Lead - Olho na Brasa</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .cta-button {
+            background-color: #ea6029;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(234, 96, 41, 0.4);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(234, 96, 41, 0.5);
+        }
+
+        .cta-button:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Teste do Modal de Captura</h1>
+        <p>Clique no botão abaixo para simular a ação do usuário na Landing Page.</p>
+
+        <!-- Botão de Disparo -->
+        <button class="cta-button" onclick="window.lbOpenModal()">
+            SOLICITAR ORÇAMENTO
+        </button>
+    </div>
+
+    <!-- Script do Widget -->
+    <script src="widget.js"></script>
+
+</body>
+
+</html>
