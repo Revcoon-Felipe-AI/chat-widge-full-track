@@ -103,13 +103,29 @@
         },
         {
             id: 'custom-text-perfect-bbq',
-            question: 'Descreva o seu churrasco dos sonhos... (o que não poderia faltar nele?)',
-            type: 'textarea'
+            text: 'O que não pode faltar no seu churrasco ideal?',
+            type: 'checkbox',
+            maxSelect: 5,
+            options: [
+                { label: 'Cortes Nobres (Picanha, Ancho, etc)', value: 'Não pode faltar Cortes Nobres' },
+                { label: 'Praticidade (Acendimento fácil)', value: 'Não pode faltar Praticidade' },
+                { label: 'Conforto (Sem fumaça)', value: 'Não pode faltar Conforto' },
+                { label: 'Social (Família e amigos)', value: 'Não pode faltar o Social' },
+                { label: 'Bebida Gelada', value: 'Não pode faltar Bebida Gelada' }
+            ]
         },
         {
             id: 'custom-text-project-vision',
-            question: 'O que mais te chamou a atenção nos projetos da Olho na Brasa e que você não abre mão em seu projeto?',
-            type: 'textarea'
+            text: 'O que é prioridade para o seu projeto?',
+            type: 'checkbox',
+            maxSelect: 5,
+            options: [
+                { label: 'Estética (Design moderno)', value: 'Prioridade é Estética' },
+                { label: 'Funcionalidade (Sistema completo com acessórios)', value: 'Prioridade é Funcionalidade (Sistema completo)' },
+                { label: 'Durabilidade (Inox)', value: 'Prioridade é Durabilidade' },
+                { label: 'Facilidade (Limpeza simples)', value: 'Prioridade é Facilidade de Limpeza' },
+                { label: 'Exclusividade (Sob medida)', value: 'Prioridade é Exclusividade' }
+            ]
         }
     ];
 
