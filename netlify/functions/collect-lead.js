@@ -1,4 +1,6 @@
 exports.handler = async function (event, context) {
+    console.log("--- COLLECT LEAD FUNCTION HIT ---");
+    console.log("Event Body:", event.body);
     // --- CORS Headers ---
     const headers = {
         'Access-Control-Allow-Origin': '*', // Allow any domain
@@ -18,12 +20,14 @@ exports.handler = async function (event, context) {
     // --- Handle POST ---
     if (event.httpMethod === 'POST') {
         try {
-            // 1. Determine Type (lead vs survey)
+            // 1. Determine Type (lead vs survey vs validation)
             const type = event.queryStringParameters.type || 'lead';
             let n8nUrl;
 
             if (type === 'survey') {
                 n8nUrl = process.env.N8N_WEBHOOK_SURVEY_URL;
+            } else if (type === 'validation') {
+                n8nUrl = process.env.N8N_WEBHOOK_VALIDATION_URL;
             } else {
                 n8nUrl = process.env.N8N_WEBHOOK_LEAD_URL;
             }
@@ -48,18 +52,20 @@ exports.handler = async function (event, context) {
             });
 
             // 4. Return n8n Response
+            const n8nData = await response.json();
+
             if (response.ok) {
                 return {
                     statusCode: 200,
                     headers,
-                    body: JSON.stringify({ message: 'Success' })
+                    body: JSON.stringify(n8nData)
                 };
             } else {
-                console.error("n8n Error:", response.status, await response.text());
+                console.error("n8n Error:", response.status, n8nData);
                 return {
                     statusCode: 502,
                     headers,
-                    body: JSON.stringify({ error: 'Upstream Error' })
+                    body: JSON.stringify({ error: 'Upstream Error', details: n8nData })
                 };
             }
 

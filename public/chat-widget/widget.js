@@ -6,7 +6,10 @@
         textColor: '#ffffff',
         botName: 'Projetos Olho na Brasa',
         botAvatar: 'https://s3.1app.com.br/master/project_24727/xy6IrcJy1jkUGTlM4qSc7cF1suHmQyDE.jpg',
-        backendUrl: 'https://widge-chat-tracking.netlify.app/.netlify/functions/collect-lead', // SUBSTITUA [SEU-SITE-NETLIFY] PELA URL DO SEU SITE NO NETLIFY
+        // backendUrl: 'https://widge-chat-tracking.netlify.app/.netlify/functions/collect-lead', 
+        backendUrl: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:8888/.netlify/functions/collect-lead'
+            : 'https://widge-chat-tracking.netlify.app/.netlify/functions/collect-lead',
         delays: {
             typing: 1000,
             message: 1500,
@@ -138,7 +141,8 @@
         survey: {},
         tracking: {},
         callout: { active: true, timer: null, msgIndex: 0 },
-        tempCheckboxValues: [] // Store checkbox values before confirming
+        tempCheckboxValues: [], // Store checkbox values before confirming
+        validationAttempts: 0
     };
 
     // --- CSS Injection ---
@@ -385,6 +389,24 @@
                 <label class="lb-form-label">CEP</label>
                 <input type="text" id="lb-cep" class="lb-form-input" placeholder="00000-000">
             </div>
+            <div class="lb-form-group">
+                <label class="lb-form-label">Como podemos te ajudar?</label>
+                <select id="lb-help-type" class="lb-form-input">
+                    <option value="">Selecione...</option>
+                    <option value="Orçamentos">Orçamentos</option>
+                    <option value="Dúvidas">Dúvidas</option>
+                    <option value="Rastreio de pedidos">Rastreio de pedidos</option>
+                </select>
+            </div>
+            <div class="lb-form-group">
+                <label class="lb-form-label">Tem interesse em qual tipo de projeto?</label>
+                <select id="lb-interest-type" class="lb-form-input">
+                    <option value="">Selecione...</option>
+                    <option value="Kit Suporte Suspenso">Kit Suporte Suspenso</option>
+                    <option value="Churrasqueira Automatizada">Churrasqueira Automatizada</option>
+                    <option value="Acessórios">Acessórios</option>
+                </select>
+            </div>
             <button class="lb-form-btn" onclick="window.lbSubmitContactInfo()">Continuar</button>
         `;
         body.appendChild(formDiv);
@@ -415,65 +437,133 @@
         const phone = document.getElementById('lb-phone').value;
         const email = document.getElementById('lb-email').value;
         const cep = document.getElementById('lb-cep').value;
+        const helpType = document.getElementById('lb-help-type').value;
+        const interest = document.getElementById('lb-interest-type').value;
 
-        if (!name || !phone || !email || !cep) {
-            alert("Por favor, preencha todos os campos obrigatórios.");
+        if (!name || !phone || !email || !cep || !helpType || !interest) {
+            showInlineError("Por favor, preencha todos os campos obrigatórios.");
             return;
         }
 
-        document.querySelector('.lb-form-bubble').remove();
-        addMessage(`Meus dados: <br>Nome: ${name} <br>WhatsApp: ${phone} <br>E-mail: ${email} <br>CEP: ${cep}`, 'user');
+        // --- Loading State ---
+        const btn = document.querySelector('.lb-form-btn');
+        const originalBtnText = btn.innerText;
+        btn.innerText = 'Validando...';
+        btn.disabled = true;
 
-        state.lead = { ...state.lead, name, phone, email, cep };
+        state.lead = { ...state.lead, name, phone, email, cep, helpType, interest };
 
-        await botSpeak(`Olá ${name.split(' ')[0]}, como podemos te ajudar?`);
-        window.lbShowInterestOptions();
-    };
+        // --- Validation via n8n ---
+        try {
+            const response = await submitData('validation', {
+                method: 'POST',
+                body: JSON.stringify({
+                    lead: state.lead,
+                    tracking: state.tracking,
+                    validation_only: true // Flag for n8n
+                })
+            });
 
-    window.lbShowInterestOptions = function () {
-        const body = document.getElementById('lb-body');
-        const btnDiv = document.createElement('div');
-        btnDiv.className = 'lb-options';
-        btnDiv.innerHTML = `
-            <button class="lb-option-btn" onclick="window.lbHandleInterest('Orçamentos')">Orçamentos</button>
-            <button class="lb-option-btn" onclick="window.lbHandleInterest('Dúvidas')">Dúvidas</button>
-            <button class="lb-option-btn" onclick="window.lbHandleInterest('Rastreio de pedidos')">Rastreio de pedidos</button>
-        `;
-        body.appendChild(btnDiv);
-        body.scrollTop = body.scrollHeight;
-    };
+            // Check Validation
+            if (response && response.valid === false) {
+                state.validationAttempts++;
+                btn.innerText = originalBtnText;
+                btn.disabled = false;
 
-    window.lbHandleInterest = async function (interest) {
-        document.querySelector('.lb-options').remove();
-        addMessage(interest, 'user');
-        state.lead.interest = interest;
+                if (state.validationAttempts >= 2) {
+                    showFallbackUI(name, phone);
+                } else {
+                    showInlineError("O número de WhatsApp informado parece inválido. Por favor, verifique e tente novamente.");
+                }
+                return;
+            } else if (response && response.error) {
+                // System Error (e.g. 500 from Netlify)
+                console.error("System Error:", response);
+                showInlineError("Ocorreu um erro ao validar seu número. Por favor, tente novamente.");
+                btn.innerText = originalBtnText;
+                btn.disabled = false;
+                return;
+            }
 
-        if (interest === 'Orçamentos') {
-            await botSpeak("Tem interesse em qual tipo de projeto?");
-            window.lbShowProjectOptions();
-        } else {
-            window.lbFinalizeLead();
+            // Success (proceed)
+            proceedToNextStep(name, phone, email, cep);
+
+        } catch (e) {
+            console.error("Validation error", e);
+            showInlineError("Erro de conexão. Verifique sua internet e tente novamente.");
+            btn.innerText = originalBtnText;
+            btn.disabled = false;
         }
     };
 
-    window.lbShowProjectOptions = function () {
-        const body = document.getElementById('lb-body');
-        const btnDiv = document.createElement('div');
-        btnDiv.className = 'lb-options';
-        btnDiv.innerHTML = `
-            <button class="lb-option-btn" onclick="window.lbHandleProject('Kit suporte Suspenso')">Kit suporte Suspenso</button>
-            <button class="lb-option-btn" onclick="window.lbHandleProject('Churrasqueira Automatizada')">Churrasqueira Automatizada</button>
-        `;
-        body.appendChild(btnDiv);
-        body.scrollTop = body.scrollHeight;
-    };
+    function showInlineError(msg) {
+        const formDiv = document.querySelector('.lb-form-bubble');
+        if (!formDiv) return;
 
-    window.lbHandleProject = async function (projectType) {
-        document.querySelector('.lb-options').remove();
-        addMessage(projectType, 'user');
-        state.lead.projectType = projectType;
+        // Remove existing error if any
+        const existingError = formDiv.querySelector('.lb-error-msg');
+        if (existingError) existingError.remove();
+
+        const errorP = document.createElement('p');
+        errorP.className = 'lb-error-msg';
+        errorP.style.color = '#ff4444';
+        errorP.style.fontSize = '12px';
+        errorP.style.marginTop = '10px';
+        errorP.style.textAlign = 'center';
+        errorP.innerText = msg;
+
+        // Insert before the button
+        const btn = formDiv.querySelector('.lb-form-btn');
+        formDiv.insertBefore(errorP, btn);
+    }
+
+    function proceedToNextStep(name, phone, email, cep) {
+        document.querySelector('.lb-form-bubble').remove();
+        addMessage(`Meus dados: <br>Nome: ${name} <br>WhatsApp: ${phone} <br>E-mail: ${email} <br>CEP: ${cep}`, 'user');
+
+        // Trigger original flow (Skip interest selection since we already have it)
         window.lbFinalizeLead();
-    };
+    }
+
+    function showFallbackUI(name, phone) {
+        const body = document.getElementById('lb-body');
+        // Remove existing form if present (it should be, inside bubble)
+        const bubble = document.querySelector('.lb-form-bubble');
+        if (bubble) bubble.remove();
+
+        addMessage(`Tentativa de contato: ${phone}`, 'user');
+
+        botSpeak("Não conseguimos validar seu número. Mas não se preocupe, você pode falar conosco diretamente!").then(() => {
+            const btnDiv = document.createElement('div');
+            btnDiv.className = 'lb-options';
+
+            // Message format: "Olá, meu nome é {nome} e eu tenho interesse no Kit Suporte Suspenso."
+            const interest = state.lead.interest || "Kit Suporte Suspenso"; // Use selected interest
+            const msg = `Olá, meu nome é ${name} e eu tenho interesse no ${interest}.`;
+            const targetNumber = '554740420956';
+            const waLink = `https://wa.me/${targetNumber}?text=${encodeURIComponent(msg)}`;
+
+            btnDiv.innerHTML = `
+                <a href="${waLink}" target="_blank" class="lb-option-btn btn-primary" style="text-decoration:none; display:block; text-align:center;">
+                    Falar no WhatsApp
+                </a>
+            `;
+            body.appendChild(btnDiv);
+            body.scrollTop = body.scrollHeight;
+
+            submitData('lead', {
+                method: 'POST',
+                body: JSON.stringify({
+                    lead: state.lead,
+                    tracking: state.tracking,
+                    fallback: true
+                })
+            });
+        });
+    }
+
+    // Redundant functions removed as interest is now captured in the initial form.
+    // lbShowInterestOptions, lbHandleInterest, lbShowProjectOptions, lbHandleProject deleted.
 
     window.lbFinalizeLead = async function () {
         await botSpeak("Enviando seus dados...");
@@ -644,14 +734,19 @@
 
         try {
             console.log(`Sending ${type} Payload:`, payload);
-            await fetch(url, {
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
                 ...options
             });
+
+            const data = await response.json();
+            return data;
+
         } catch (error) {
             console.error("Error submitting:", error);
+            return { error: true };
         }
     }
 
