@@ -593,34 +593,40 @@
 
             // Check Validation
             if (response && response.valid === false) {
-                state.validationAttempts++;
-                btn.disabled = false;
-                btnText.innerText = originalText;
-
-                if (state.validationAttempts >= 2) {
-                    showModalFallback(name, phone);
-                } else {
-                    showInlineError("O número de WhatsApp informado parece inválido. Por favor, verifique e tente novamente.");
-                }
+                handleValidationFailure(name, phone, originalText, btn, btnText, "O número de WhatsApp informado parece inválido. Por favor, verifique e tente novamente.");
                 return;
             } else if (response && response.error) {
                 console.error("System Error:", response);
-                showInlineError("Ocorreu um erro ao validar seu número. Por favor, tente novamente.");
-                btn.disabled = false;
-                btnText.innerText = originalText;
+                handleValidationFailure(name, phone, originalText, btn, btnText, "Ocorreu um erro ao validar seu número. Por favor, tente novamente.");
                 return;
             }
 
-            // Success or Error (proceed)
+            // Success (Validation Passed)
+            // Send Lead Data to CRM/Sheet
+            await sendData('lead', {
+                lead: state.lead,
+                tracking: state.tracking
+            });
+
             proceedToStep2();
 
         } catch (e) {
             console.error("Validation error", e);
-            showInlineError("Erro de conexão. Verifique sua internet e tente novamente.");
-            btn.disabled = false;
-            btnText.innerText = originalText;
+            handleValidationFailure(name, phone, originalText, btn, btnText, "Erro de conexão. Verifique sua internet e tente novamente.");
         }
     };
+
+    function handleValidationFailure(name, phone, originalText, btn, btnText, msg) {
+        state.validationAttempts++;
+        btn.disabled = false;
+        btnText.innerText = originalText;
+
+        if (state.validationAttempts >= 2) {
+            showModalFallback(name, phone);
+        } else {
+            showInlineError(msg);
+        }
+    }
 
     function showInlineError(msg) {
         const body = document.querySelector('.lb-modal-body');
@@ -732,10 +738,10 @@
 
     async function submitQuizFinal() {
         // Loading State
-        const btn = document.querySelector('.lb-btn');
-        const btnText = document.getElementById('lb-btn-text-2');
+        const btn = document.querySelector('.lb-btn-next');
+        const originalText = btn.innerText;
         btn.disabled = true;
-        btnText.innerHTML = '<div class="lb-loader"></div>';
+        btn.innerText = 'ENVIANDO...';
 
         // Send to Webhook 2 (Quiz -> Survey)
         await sendData('survey', {
