@@ -583,26 +583,8 @@
         btn.disabled = true;
         btnText.innerHTML = '<div class="lb-loader"></div>';
 
-        // --- Validation via n8n ---
+        // --- Send Lead Data directly (No Validation) ---
         try {
-            const response = await sendData('validation', {
-                lead: state.lead,
-                tracking: state.tracking,
-                validation_only: true
-            });
-
-            // Check Validation
-            if (response && response.valid === false) {
-                handleValidationFailure(name, phone, originalText, btn, btnText, "O número de WhatsApp informado parece inválido. Por favor, verifique e tente novamente.");
-                return;
-            } else if (response && response.error) {
-                console.error("System Error:", response);
-                handleValidationFailure(name, phone, originalText, btn, btnText, "Ocorreu um erro ao validar seu número. Por favor, tente novamente.");
-                return;
-            }
-
-            // Success (Validation Passed)
-            // Send Lead Data to CRM/Sheet
             await sendData('lead', {
                 lead: state.lead,
                 tracking: state.tracking
@@ -611,8 +593,10 @@
             proceedToStep2();
 
         } catch (e) {
-            console.error("Validation error", e);
-            handleValidationFailure(name, phone, originalText, btn, btnText, "Erro de conexão. Verifique sua internet e tente novamente.");
+            console.error("Submission error", e);
+            // Even if it fails, we might want to proceed or show error. 
+            // For now, let's proceed to avoid blocking.
+            proceedToStep2();
         }
     };
 

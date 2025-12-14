@@ -448,52 +448,13 @@
         // --- Loading State ---
         const btn = document.querySelector('.lb-form-btn');
         const originalBtnText = btn.innerText;
-        btn.innerText = 'Validando...';
+        btn.innerText = 'Enviando...';
         btn.disabled = true;
 
         state.lead = { ...state.lead, name, phone, email, cep, helpType, interest };
 
-        // --- Validation via n8n ---
-        try {
-            const response = await submitData('validation', {
-                method: 'POST',
-                body: JSON.stringify({
-                    lead: state.lead,
-                    tracking: state.tracking,
-                    validation_only: true // Flag for n8n
-                })
-            });
-
-            // Check Validation
-            if (response && response.valid === false) {
-                state.validationAttempts++;
-                btn.innerText = originalBtnText;
-                btn.disabled = false;
-
-                if (state.validationAttempts >= 2) {
-                    showFallbackUI(name, phone);
-                } else {
-                    showInlineError("O número de WhatsApp informado parece inválido. Por favor, verifique e tente novamente.");
-                }
-                return;
-            } else if (response && response.error) {
-                // System Error (e.g. 500 from Netlify)
-                console.error("System Error:", response);
-                showInlineError("Ocorreu um erro ao validar seu número. Por favor, tente novamente.");
-                btn.innerText = originalBtnText;
-                btn.disabled = false;
-                return;
-            }
-
-            // Success (proceed)
-            proceedToNextStep(name, phone, email, cep);
-
-        } catch (e) {
-            console.error("Validation error", e);
-            showInlineError("Erro de conexão. Verifique sua internet e tente novamente.");
-            btn.innerText = originalBtnText;
-            btn.disabled = false;
-        }
+        // --- Direct Submission (No Validation) ---
+        proceedToNextStep(name, phone, email, cep);
     };
 
     function showInlineError(msg) {
