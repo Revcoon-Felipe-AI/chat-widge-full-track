@@ -193,6 +193,33 @@
             .lb-form-btn { width: 100%; background-color: ${CONFIG.primaryColor}; color: white; border: none; font-size: 14px; text-transform: uppercase; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 5px; }
             .lb-form-btn:hover { background-color: #d15423; }
 
+            /* Phone Container */
+            .lb-phone-container { display: flex; gap: 8px; align-items: center; width: 100%; box-sizing: border-box; }
+            .lb-ddi-select { 
+                flex: 0 0 95px; /* Fixed width for stability, slightly wider for "🇧🇷 +55" */
+                width: 95px;
+                padding: 8px 4px; 
+                border: 1px solid #ddd; 
+                border-radius: 4px; 
+                font-size: 14px; 
+                outline: none; 
+                background: white; 
+                height: 35px; /* Match input height */
+                box-sizing: border-box;
+            }
+            .lb-ddi-select:focus { border-color: ${CONFIG.primaryColor}; }
+            
+            .lb-form-input { 
+                width: 100%; 
+                padding: 8px; 
+                border: 1px solid #ddd; 
+                border-radius: 4px; 
+                font-size: 14px; 
+                outline: none; 
+                box-sizing: border-box; 
+                height: 35px; /* Fixed height for alignment */
+            }
+
             /* Unified Quiz Card */
             .lb-quiz-card { background: #f0f0f0; padding: 15px; border-radius: 12px; border-top-left-radius: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.1); width: 100%; max-width: 85%; align-self: flex-start; display: flex; flex-direction: column; gap: 12px; animation: lb-fade-in 0.3s ease; }
             .lb-quiz-question { font-size: 14px; color: #333; line-height: 1.4; font-weight: 600; margin-bottom: 4px; }
@@ -379,7 +406,22 @@
             </div>
             <div class="lb-form-group">
                 <label class="lb-form-label">WhatsApp</label>
-                <input type="tel" id="lb-phone" class="lb-form-input" placeholder="(00) 00000-0000">
+                <div class="lb-phone-container">
+                    <select id="lb-ddi" class="lb-ddi-select">
+                        <option value="55" selected>🇧🇷 +55</option>
+                        <option value="1">🇺🇸 +1</option>
+                        <option value="351">🇵🇹 +351</option>
+                        <option value="44">🇬🇧 +44</option>
+                        <option value="34">🇪🇸 +34</option>
+                        <option value="33">🇫🇷 +33</option>
+                        <option value="49">🇩🇪 +49</option>
+                        <option value="39">🇮🇹 +39</option>
+                        <option value="54">🇦🇷 +54</option>
+                        <option value="598">🇺🇾 +598</option>
+                        <option value="595">🇵🇾 +595</option>
+                    </select>
+                    <input type="tel" id="lb-phone" class="lb-form-input" placeholder="(00) 00000-0000" style="flex:1;">
+                </div>
             </div>
             <div class="lb-form-group">
                 <label class="lb-form-label">E-mail</label>
@@ -434,7 +476,9 @@
 
     window.lbSubmitContactInfo = async function () {
         const name = document.getElementById('lb-name').value;
-        const phone = document.getElementById('lb-phone').value;
+        const phoneRaw = document.getElementById('lb-phone').value;
+        const ddi = document.getElementById('lb-ddi').value;
+        const phone = ddi + phoneRaw.replace(/\D/g, ''); // Combine DDI + Numbers only
         const email = document.getElementById('lb-email').value;
         const cep = document.getElementById('lb-cep').value;
         const helpType = document.getElementById('lb-help-type').value;

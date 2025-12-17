@@ -223,6 +223,23 @@
                 margin-bottom: 6px; 
                 text-shadow: 0;
             }
+            /* Phone Container */
+            .lb-phone-container { display: flex; gap: 8px; align-items: center; width: 100%; box-sizing: border-box; }
+            .lb-ddi-select { 
+                flex: 0 0 95px; 
+                width: 95px;
+                padding: 12px 8px; 
+                border: 1px solid rgba(255, 255, 255, 0.3); 
+                border-radius: 8px; 
+                font-size: 15px; 
+                outline: none; 
+                background: rgba(255, 255, 255, 1); 
+                color: #232323ff; 
+                height: 45px; /* Match input height */
+                box-sizing: border-box;
+            }
+            .lb-ddi-select:focus { background: #fff; border-color: #fff; box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2); }
+            
             .lb-input {
                 width: 100%;
                 padding: 12px 15px;
@@ -234,13 +251,8 @@
                 box-sizing: border-box;
                 background: rgba(255, 255, 255, 1);
                 color: #232323ff;
+                height: 45px; /* Fixed height for alignment */
             }
-            .lb-input:focus { 
-                background: #fff;
-                border-color: #fff; 
-                box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2); 
-            }
-            .lb-input::placeholder { color: #888; }
             
             .lb-btn {
                 width: 100%;
@@ -416,7 +428,22 @@
                 </div>
                 <div class="lb-form-group">
                     <label class="lb-label">Telefone</label>
-                    <input type="tel" id="lb-phone" class="lb-input" placeholder="(DDD) 99999-9999">
+                    <div class="lb-phone-container">
+                        <select id="lb-ddi" class="lb-ddi-select">
+                            <option value="55" selected>🇧🇷 +55</option>
+                            <option value="1">🇺🇸 +1</option>
+                            <option value="351">🇵🇹 +351</option>
+                            <option value="44">🇬🇧 +44</option>
+                            <option value="34">🇪🇸 +34</option>
+                            <option value="33">🇫🇷 +33</option>
+                            <option value="49">🇩🇪 +49</option>
+                            <option value="39">🇮🇹 +39</option>
+                            <option value="54">🇦🇷 +54</option>
+                            <option value="598">🇺🇾 +598</option>
+                            <option value="595">🇵🇾 +595</option>
+                        </select>
+                        <input type="tel" id="lb-phone" class="lb-input" placeholder="(DDD) 99999-9999" style="flex:1;">
+                    </div>
                 </div>
                 <div class="lb-form-group">
                     <label class="lb-label">CEP</label>
@@ -566,7 +593,9 @@
     window.lbSubmitContact = async function () {
         const name = document.getElementById('lb-name').value.trim();
         const email = document.getElementById('lb-email').value.trim();
-        const phone = document.getElementById('lb-phone').value.trim();
+        const phoneRaw = document.getElementById('lb-phone').value.trim();
+        const ddi = document.getElementById('lb-ddi').value;
+        const phone = ddi + phoneRaw.replace(/\D/g, ''); // Combine DDI + Numbers only
         const cep = document.getElementById('lb-cep').value.trim();
 
         if (!name || !email || !phone || !cep) {
